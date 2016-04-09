@@ -7,7 +7,7 @@
   "main": "js/reveal.js",
   "scripts": {
     "test": "grunt test",
-    "code": "mocha --compilers js:babel-register --require mochasetup.js --watch code/tests.js",
+    "code": "mocha --compilers js:babel-register --require mochasetup.js --watch code/*-spec.js",
     "lint": "eslint code",
     "start": "grunt serve"
   },
