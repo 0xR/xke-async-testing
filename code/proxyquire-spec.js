@@ -13,10 +13,15 @@ describe('proxyquire', () => {
 
   it('should fetch luke skywalker', () => {
     fetchMock.returns(Promise.resolve({
-      json() {
-        return { name: 'luke skywalker' };
-      },
+      json: () => ({ name: 'luke skywalker' }),
     }));
-    return expect(getPeople(1)).to.become({ name: 'luke skywalker' });
+
+    const person1 = getPeople(1);
+    expect(fetchMock).to.have.been.calledWith(
+      'http://swapi.co/api/people/1/'
+    );
+    return expect(person1).to.become({
+      name: 'luke skywalker',
+    });
   });
 });

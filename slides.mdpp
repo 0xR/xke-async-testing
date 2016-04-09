@@ -1,0 +1,188 @@
+# Async and testability
+
+---
+
+### Testing pure functions
+``` javascript
+// pure-function-spec.js
+<!-- @include ./code/pure-function-spec.js -->
+```
+
+---
+
+### Monkey patching
+``` javascript
+// monkey-patching-console.log-spec.js
+<!-- @include ./code/monkey-patching-console.log-spec.js -->
+```
+
+---
+
+### Async code
+``` javascript
+// getPeople.js
+<!-- @include ./code/getPeople.js -->
+```
+
+vvv
+
+### Nock monkey patches Node's HTTP API
+``` javascript
+// monkey-patching-fetch-spec.js
+<!-- @include ./code/monkey-patching-fetch-spec.js -->
+```
+
+vvv
+
+### 
+``` javascript
+// proxyquire-spec.js
+<!-- @include ./code/proxyquire-spec.js -->
+```
+
+Note:
+- Proxyquire monkey patches require
+- Use import string from file under test
+
+---
+
+### Dependency injection (like Angular)
+``` javascript
+// PeopleService.js
+<!-- @include ./code/PeopleService.js -->
+```
+Note:
+- ngInject to figure out fetch
+- parse function.toString
+- generic dependency injection is difficult
+  - need instances, which need other instances
+  - dependency tree
+
+vvv
+
+### Custom dependency injection
+``` javascript
+// PeopleService.js
+export default function PeopleService({ fetch }) {
+  this.getPeople = (id) =>
+    fetch(`http://swapi.co/api/people/${id}/`)
+      .then(res => res.json());
+}
+```
+Note:
+- destructure dependency object
+
+vvv
+
+### 
+``` javascript
+// depedencency-injection-spec.js
+<!-- @include ./code/depedencency-injection-spec.js -->
+```
+
+Note:
+- Create instance in beforeEach
+- Configure mock in your test
+- Assert calledWith
+
+---
+
+### Redux Saga
+``` javascript
+// getPeopleSaga.js
+<!-- @include ./code/getPeopleSaga.js -->
+```
+
+Note:
+- A saga is standard es2015 generator
+- No side effects
+  - Call is a pure function which returns a plain object
+  - The saga middleware performs sideeffects
+  - In FP you can have side effects as long as don't perform them yourselve.
+- Easy to test
+
+vvv
+
+### Testing the Saga
+``` javascript
+// redux-saga-spec.js
+<!-- @include ./code/redux-saga-spec.js -->
+```
+Note:
+
+* No beforeEach/afterEach
+* Fetch does not occur
+* call actually return a plain javascript object
+
+vvv
+
+### Call is a plain `Object`
+```javascript
+expect(fetchCall.value).to.deep.equal({
+  '@@redux-saga/IO': true,
+  CALL: {
+    args: ['http://swapi.co/api/people/1/'],
+    context: [null],
+    fn: fetch,
+  },
+});
+```
+
+vvv
+
+### Compiled generator
+```javascript
+function getPeopleSaga(id) {
+  var res;
+  return regeneratorRuntime.wrap(function getPeopleSaga$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          _context.next = 2;
+          return (0, _effects.call)(
+            _nodeFetch2.default,
+            'http://swapi.co/api/people/' + id + '/'
+          );
+        case 2:
+          res = _context.sent;
+          return _context.abrupt('return', res.json());
+        case 4:
+        case 'end':
+          return _context.stop();
+      }
+    }
+  }, _marked[0], this);
+}
+```
+
+Note:
+- Don't look too much to the details
+- Function is split up
+- Execute the steps separately
+
+- Why generator and not async/await?
+
+---
+
+### Async / await
+
+``` javascript
+// asyncGetPeople.js
+<!-- @include ./code/asyncGetPeople.js -->
+```
+
+Note:
+- It still is a generator
+- The result of `asyncGetPeople(id)` is a `Promise`
+- `next()` is called automatically
+- Can't call next from a test
+- No access to the call object for the saga middleware
+- Test like any other function that returns a `Promise`
+
+vvv
+
+### 
+``` javascript
+// proxyquire-async-spec.js
+<!-- @include ./code/proxyquire-async-spec.js -->
+```

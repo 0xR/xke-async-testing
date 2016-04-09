@@ -100,6 +100,14 @@ module.exports = function(grunt) {
 			}
 		},
 
+
+		preprocess: {
+		  slides: {
+			src: './slides.mdpp',
+			dest: './slides.md'
+		  }
+		},
+
 		zip: {
 			'reveal-js-presentation.zip': [
 				'index.html',
@@ -133,6 +141,10 @@ module.exports = function(grunt) {
 			},
 			markdown: {
 				files: [ '*.md' ]
+			},
+			markdownTemplates: {
+				files: [ '*.mdpp', 'code/*' ],
+				tasks: 'preprocess'
 			}
 		}
 
@@ -148,6 +160,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks( 'grunt-contrib-connect' );
 	grunt.loadNpmTasks( 'grunt-autoprefixer' );
 	grunt.loadNpmTasks( 'grunt-zip' );
+	grunt.loadNpmTasks( 'grunt-preprocess' );
 
 	// Default task
 	grunt.registerTask( 'default', [ 'css', 'js' ] );

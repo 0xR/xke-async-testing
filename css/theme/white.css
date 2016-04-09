@@ -45,7 +45,6 @@ body {
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: normal;
-  text-transform: uppercase;
   text-shadow: none;
   word-wrap: break-word; }
 
@@ -157,7 +156,6 @@ body {
   display: block;
   padding: 5px;
   overflow: auto;
-  max-height: 400px;
   word-wrap: normal; }
 
 .reveal table {
