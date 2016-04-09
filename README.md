@@ -2,7 +2,7 @@
 
 ```sh
 # show slides
-grunt start
+npm start
 
 # run code examples from slides
 npm run code
