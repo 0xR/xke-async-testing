@@ -7,10 +7,44 @@
 // pure-function-spec.js
 <!-- @include ./code/pure-function-spec.js -->
 ```
+Note:
+- Why is this easy to test?
+  - All behavior can be asserted from the retuned value
+  - In other words there are no side effects:
+    - Effects next to the returned value
+
+vvv
+
+### Side effects
+- Make testing difficult
+- Can be recognized by:
+  - `void` methods
+  - Async / IO call
+  - Mutation of (global) state
+Note:
+- Today examples of testing side effects
+- As well as a method on avoiding them all together
 
 ---
 
 ### Monkey patching
+```javascript
+const originalConsoleLog = console.log;
+console.log = mySpy;
+
+// Run the method under test
+expect(console.log).to.have.been.calledWith('some value');
+
+console.log = originalConsoleLog;
+```
+Note:
+- The only option for testing globals
+- Does not work when testing window.location
+- Also the default in Python
+
+vvv
+
+### Monkey patching with a library
 ``` javascript
 // monkey-patching-console.log-spec.js
 <!-- @include ./code/monkey-patching-console.log-spec.js -->
@@ -18,9 +52,8 @@
 
 Note:
 - Replace a method with a proxy / mock
-- Also the default in Python
 - Restore the method afterwards
-- If you don't clean up your mock is still there in the next unit test
+- If you don't clean up your spy is still there in the next unit test
 
 ---
 
@@ -33,6 +66,8 @@ Note:
 Note:
 - Always write error handling when working with fetch
   - Promises can lose errors
+- Why is this difficult to test?
+  - Because side effects
 
 vvv
 
@@ -97,6 +132,23 @@ Note:
 
 ---
 
+### Redux
+Does not need any side effects in:
+- View
+- Reducers (update state)
+- Synchronous action creators
+
+Just one place left for side effects:
+- Asynchronous action creators
+
+Note:
+- React view props -> view
+- Reducers always return a new state, no mutation
+- Normal actions creators just return an object
+- You need io / network calls
+
+---
+
 ### Redux Saga
 - And alternative Side Effects middleware for Redux
 - No side effects your code
@@ -123,6 +175,8 @@ Note:
   - Call is a pure function which returns a plain object
   - The saga middleware performs sideeffects
   - In FP you can have side effects as long as don't perform them yourself.
+- Not just for fetch, but for any call with side effects
+  - Even Synchronous calls
 - Easy to test
 
 vvv
@@ -227,14 +281,21 @@ vvv
 
 ---
 
-### What about RxJS?
-
-- You could use `Observable.fromPromise`
-- Doesn't solve testability issues
+### More complex saga
+``` javascript
+// complexSaga.js
+<!-- @include ./code/complexSaga.js -->
+```
 
 Note:
-- Still sideeffects
-- Monkeypatching / dependency injection still required
-- RxJS solves different problems:
-  - Processing event streams
-  - Cancelling requests, event listeners
+- More redux specific
+- Takes actions
+- Dispatches actions
+- Console.error is part of a call() for testability
+  - Of course you can also perform the monkey patching
+
+---
+
+### Takeaways
+- There are multiple ways to make your code testable
+- If you're tired
