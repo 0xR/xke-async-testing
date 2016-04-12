@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { call } from 'redux-saga/effects';
+import { call, put } from 'redux-saga/effects';
 import getPeople from './getPeopleSaga.js';
 
 describe('redux saga', () => {
@@ -11,13 +11,22 @@ describe('redux saga', () => {
       call(fetch, 'http://swapi.co/api/people/1/')
     );
 
-    const result = generator.next({
-      json: () => ({ name: 'luke skywalker' }),
+    const yieldJson = generator.next({
+      json: () => 'json promise',
     });
 
-    expect(result.value).to.deep.equal({
+    expect(yieldJson.value).to.deep.equal('json promise');
+
+    const dispatchedAction = generator.next({
       name: 'luke skywalker',
     });
-    expect(result.done).to.equal(true);
+
+    expect(dispatchedAction.value).to.deep.equal(put({
+      type: 'GOT_PERSON',
+      person: { name: 'luke skywalker' },
+    }));
+
+    const afterPut = generator.next();
+    expect(afterPut.done).to.equal(true);
   });
 });

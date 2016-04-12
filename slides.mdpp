@@ -149,6 +149,21 @@ Note:
 
 ---
 
+### Redux Thunk
+``` javascript
+// getPeopleThunk.js
+<!-- @include ./code/getPeopleThunk.js -->
+```
+
+vvv
+
+``` javascript
+// get-people-thunk-spec.js
+<!-- @include ./code/get-people-thunk-spec.js -->
+```
+
+---
+
 ### Redux Saga
 - And alternative Side Effects middleware for Redux
 - No side effects your code
@@ -178,6 +193,43 @@ Note:
 - Not just for fetch, but for any call with side effects
   - Even Synchronous calls
 - Easy to test
+
+vvv
+
+### Testing the Saga
+``` javascript
+const generator = getPeople(1);
+
+const fetchCall = generator.next();
+expect(fetchCall.value).to.deep.equal(
+  call(fetch, 'http://swapi.co/api/people/1/')
+);
+const yieldJson = generator.next({
+  json: () => 'json promise',
+});
+```
+Note:
+- What is being yielded on is teh result of next
+- You can assert on that
+
+- The result of the yield can be passed in next
+
+vvv
+
+### Testing the Saga
+``` javascript
+const generator = getPeople(1);
+
+const fetchCall = generator.next();
+expect(fetchCall.value).to.deep.equal(
+  call(fetch, 'http://swapi.co/api/people/1/')
+);
+const yieldJson = generator.next({
+  json: () => 'json promise',
+});
+```
+Note:
+- The result of the yield can be passed in next
 
 vvv
 
@@ -251,6 +303,8 @@ Note:
 - If a saga gets cancelled an exception is thrown inside it
   - Implement it yourself
 - Any async call / fetch in parallel
+- But these are generators?
+  - generator runtime 5.5k 2.1k gzipped
 
 - Why generator and not async/await?
 
@@ -297,5 +351,16 @@ Note:
 ---
 
 ### Takeaways
-- There are multiple ways to make your code testable
-- If you're tired
+- All code can be written testable
+- Mocks / monkeypatches make tests hard to read (and write)
+- It is possible to avoid mocks / monkeypatching alltogether
+
+Slides + code:
+https://github.com/0xR/xke-async-testing
+
+Note:
+- No excuse not to test
+- Mocks / monkeypatches and proxyquire makes things difficult to read
+- It can be avoided by redux saga
+- Make your own alternative if you're not doing redux
+- Not too loud: I've shown IO monads in JS
