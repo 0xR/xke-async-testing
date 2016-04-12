@@ -21,6 +21,7 @@ vvv
   - `void` methods
   - Async / IO call
   - Mutation of (global) state
+
 Note:
 - Today examples of testing side effects
 - As well as a method on avoiding them all together
@@ -37,10 +38,12 @@ expect(console.log).to.have.been.calledWith('some value');
 
 console.log = originalConsoleLog;
 ```
+
 Note:
+- void method
 - The only option for testing globals
 - Does not work when testing window.location
-- Also the default in Python
+- Monkey patching also the default in Python
 
 vvv
 
@@ -54,6 +57,7 @@ Note:
 - Replace a method with a proxy / mock
 - Restore the method afterwards
 - If you don't clean up your spy is still there in the next unit test
+- Somewhat difficult, beforeEach, afterEach
 
 ---
 
@@ -119,7 +123,6 @@ Note:
 
 vvv
 
-### 
 ``` javascript
 // depedencency-injection-spec.js
 <!-- @include ./code/depedencency-injection-spec.js -->
@@ -294,7 +297,7 @@ vvv
 
 ### About Redux saga
 - No hot module reloading of the saga (yet)
-- You can run calls in parallel
+- You can run calls in parallel (like Promise.all)
 - Use `fork` to run entire Sagas in parallel
 
 Note:
