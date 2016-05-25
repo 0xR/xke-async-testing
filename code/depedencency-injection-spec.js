@@ -18,7 +18,7 @@ describe('depedencency injection', () => {
     );
 
     return expect(person1).to.become({
-      name: 'luke skywalker'
+      name: 'luke skywalker',
     });
   });
 });

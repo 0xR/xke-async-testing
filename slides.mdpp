@@ -165,6 +165,119 @@ vvv
 <!-- @include ./code/get-people-thunk-spec.js -->
 ```
 
+Note:
+- The point of this code it show that is difficult
+- Set up a mock for fetch and dispatch
+- Work with promises / chai as promised
+- Everything is async
+- We can do better
+- First some background about generators
+
+---
+
+### Generators!
+- Function that can be entered multiple times
+- Context is saved across re-entrances
+- Standard JS feature (es2015)
+- Only small runtime/polyfill required (2.2 min + gzip)
+
+Note:
+- Standard es2015 javascript feature
+- Use it with babel and a 5 kb runtime minified js (2 kb gzipped)
+- Based on Python generators
+- Without a code example this is really fague
+
+vvv
+
+### Example generator
+``` javascript
+// generate-fibonacci.js
+<!-- @include ./code/generate-fibonacci.js -->
+```
+
+Note:
+- The context a / b are saved
+- It will product infinite fibonacci numbers
+- Can be invoked Synchronous and Asynchronous
+- Pull based
+
+vvv
+
+### Consuming the generator
+``` javascript
+// generate-fibonacci-spec.js
+it('should return fibonacci numbers', () => {
+  const fibonacciNumbers = [];
+  const generator = generateFibonacci();
+
+  for (let i = 0, number; i < 8; i++) {
+    number = generator.next();
+    fibonacciNumbers.push(number.value);
+  }
+
+  expect(fibonacciNumbers).to.deep.equal(
+    [1, 1, 2, 3, 5, 8, 13, 21]
+  );
+});
+```
+
+Note:
+- Yes I can use a for / of loop here
+- This an example of synchronous consumption
+- Generator.next() can be called in async handlers
+- There is a async example in the code of this presentation
+- Async is hard therefore I won't show that example
+
+vvv
+
+### Generators for async
+- A generator basically defines a sequence of callbacks
+- You can pass values into a generator using:
+  - `generator.next(value)`
+  - `generator.throw(value)`
+- If you generate promises you get async / await
+
+Note:
+- You could write a function which gets the promise
+- and then passes the result or exception back into the generator
+- Next actually takes arguments
+
+vvv
+
+### Async / await does not remove side effects
+
+``` javascript
+// asyncGetPeople.js
+<!-- @include ./code/asyncGetPeople.js -->
+```
+
+Note:
+- It still is a generator
+- The result of `asyncGetPeople(id)` is a `Promise`
+- `next()` is called automatically
+- Can't call next from a test
+- No access to the call object for the saga middleware
+- Test like any other function that returns a `Promise`
+
+vvv
+
+### Now without side effects
+``` javascript
+// semi code
+export default function* getPeopleSaga(id) {
+  const res = yield {
+    action: 'call',
+    object: fetch,
+    args: [`http://swapi.co/api/people/${id}/`]
+  };
+
+  return res.json();
+}
+```
+
+Note:
+- This removed the sideeffects but you need a runner to make this code work
+
 ---
 
 ### Redux Saga
@@ -311,23 +424,6 @@ Note:
 
 - Why generator and not async/await?
 
----
-
-### Async / await
-
-``` javascript
-// asyncGetPeople.js
-<!-- @include ./code/asyncGetPeople.js -->
-```
-
-Note:
-- It still is a generator
-- The result of `asyncGetPeople(id)` is a `Promise`
-- `next()` is called automatically
-- Can't call next from a test
-- No access to the call object for the saga middleware
-- Test like any other function that returns a `Promise`
-
 vvv
 
 ### 
@@ -335,21 +431,6 @@ vvv
 // proxyquire-async-spec.js
 <!-- @include ./code/proxyquire-async-spec.js -->
 ```
-
----
-
-### More complex saga
-``` javascript
-// complexSaga.js
-<!-- @include ./code/complexSaga.js -->
-```
-
-Note:
-- More redux specific
-- Takes actions
-- Dispatches actions
-- Console.error is part of a call() for testability
-  - Of course you can also perform the monkey patching
 
 ---
 
