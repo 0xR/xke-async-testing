@@ -95,6 +95,90 @@ Note:
 
 ---
 
+### Async code with timers
+``` javascript
+// Timer.js
+<!-- @include ./code/Timer.js -->
+```
+
+Note:
+- This is a component which shows the current time
+- updates every 500ms
+- Uses setInterval, clearInterval
+
+vvv
+
+### Testing timers
+``` javascript
+// Timer-spec.js
+beforeEach(() => {
+  sandbox = sinon.sandbox.create();
+  sandbox.useFakeTimers();
+  sandbox.spy(global, 'setInterval');
+  sandbox.spy(global, 'clearInterval');
+  wrapper = shallow(<Timer />);
+});
+
+afterEach(() => {
+  sandbox.restore();
+});
+```
+
+Note:
+- Again we are monkeypatching globals
+- Note the sandbox.restore
+  - restores all monkey patches
+- useFakeTimers makes the code synchronous
+- you can deterimne how much time should pass during tests
+- note we're using enzyme shallow rendering
+
+vvv
+
+### Testing timers
+``` javascript
+// Timer-spec.js
+it('should update state.time every 500ms', () => {
+  expect(wrapper.state()).to.deep.equal({ time: new Date(0) });
+  sandbox.clock.tick(499);
+  expect(wrapper.state()).to.deep.equal({ time: new Date(0) });
+  sandbox.clock.tick(1);
+  expect(wrapper.state()).to.deep.equal({ time: new Date(500) });
+  sandbox.clock.tick(500);
+  expect(wrapper.state()).to.deep.equal({ time: new Date(1000) });
+});
+```
+
+Note:
+- State is not updated until 500 ms
+- Check it keeps updating
+- This test actually reads really nicely
+- It is fully synchronous
+
+vvv
+
+### Testing the cleanup
+``` javascript
+// Timer-spec.js
+it('should clear the interval on unmount', () => {
+  expect(setInterval).to.have.callCount(1);
+  wrapper.unmount();
+  expect(clearInterval).to.have.been.calledWithExactly(
+    setInterval.returnValues[0]
+  );
+});
+```
+
+Note:
+- This is why we are spying on setInterval and clearInterval
+- We are just using the globals here which are spies
+- We check the callCount to make sure only one setInterval was created
+  - to.have.callCount is an example of sinon chai
+- Then we make sure that setInterval was cleared
+- The returnValues array is filled with results of underlying setInterval
+
+
+---
+
 ### Dependency injection (like Angular)
 ``` javascript
 // PeopleService.js
@@ -124,8 +208,8 @@ Note:
 vvv
 
 ``` javascript
-// depedencency-injection-spec.js
-<!-- @include ./code/depedencency-injection-spec.js -->
+// dependency-injection-spec.js
+<!-- @include ./code/dependency-injection-spec.js -->
 ```
 
 Note:
@@ -276,6 +360,7 @@ export default function* getPeopleSaga(id) {
 ```
 
 Note:
+- This is a generator which generates a description of a side effect
 - This removed the sideeffects but you need a runner to make this code work
 
 ---

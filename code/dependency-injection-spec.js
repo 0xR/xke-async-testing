@@ -1,5 +1,5 @@
 import PeopleService from './PeopleService.js';
-describe('depedencency injection', () => {
+describe('dependency injection', () => {
   let peopleService;
   let fetchMock;
 
