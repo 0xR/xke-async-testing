@@ -61,7 +61,7 @@ Note:
 
 ---
 
-### Async code
+### Async code - Fetches
 ``` javascript
 // getPeople.js
 <!-- @include ./code/getPeople.js -->
@@ -92,10 +92,13 @@ Note:
 - Proxyquire monkey patches require
 - No need to clean the patch
 - Use import string from file under test
+- This test is asynchronous
+- Using chai-as-promised
+- We have to return a promise
 
 ---
 
-### Async code with timers
+### Async code - Timers
 ``` javascript
 // Timer.js
 <!-- @include ./code/Timer.js -->
@@ -252,6 +255,10 @@ vvv
 Note:
 - The point of this code it show that is difficult
 - Set up a mock for fetch and dispatch
+- Could use nock to avoid the proxyquire for fetch
+  - Redux docs advise this
+  - In production code this is probably a service instead of fetch
+  - Otherwise the code will looks the same
 - Work with promises / chai as promised
 - Everything is async
 - We can do better
@@ -343,6 +350,18 @@ Note:
 - No access to the call object for the saga middleware
 - Test like any other function that returns a `Promise`
 
+
+vvv
+
+### Testing async / await is still difficult
+``` javascript
+// proxyquire-async-spec.js
+<!-- @include ./code/proxyquire-async-spec.js -->
+```
+
+Note:
+- This still looks a look like testing with redux-thunk
+
 vvv
 
 ### Now without side effects
@@ -410,31 +429,11 @@ const yieldJson = generator.next({
 });
 ```
 Note:
-- What is being yielded on is teh result of next
-- You can assert on that
-
 - The result of the yield can be passed in next
 
 vvv
 
-### Testing the Saga
-``` javascript
-const generator = getPeople(1);
-
-const fetchCall = generator.next();
-expect(fetchCall.value).to.deep.equal(
-  call(fetch, 'http://swapi.co/api/people/1/')
-);
-const yieldJson = generator.next({
-  json: () => 'json promise',
-});
-```
-Note:
-- The result of the yield can be passed in next
-
-vvv
-
-### Testing the Saga
+### Testing the Saga full spec
 ``` javascript
 // redux-saga-spec.js
 <!-- @include ./code/redux-saga-spec.js -->
@@ -443,6 +442,7 @@ Note:
 
 * No beforeEach/afterEach
 * Fetch does not occur
+* No need for chai-as-promised
 * call actually return a plain javascript object
 
 vvv
@@ -506,16 +506,6 @@ Note:
 - Any async call / fetch in parallel
 - But these are generators?
   - generator runtime 5.5k 2.1k gzipped
-
-- Why generator and not async/await?
-
-vvv
-
-### 
-``` javascript
-// proxyquire-async-spec.js
-<!-- @include ./code/proxyquire-async-spec.js -->
-```
 
 ---
 
